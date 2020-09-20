@@ -9,4 +9,8 @@
 
 # rspec failure tracking
 .rspec_status
+
+# wireshark capture files
 *.pcapng
+# sed backups
+*.bak
