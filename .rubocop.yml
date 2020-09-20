@@ -1,0 +1,8 @@
+Layout/HashAlignment:
+  EnforcedColonStyle:
+    - key
+    - table
+Style/StringLiterals:
+  EnforcedStyle: double_quotes
+Style/TrailingCommaInHashLiteral:
+  EnforcedStyleForMultiline: comma
