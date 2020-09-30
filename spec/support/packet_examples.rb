@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-RSpec.shared_examples_for "packet" do |type, empty_body: false|
+RSpec.shared_examples_for "packet" do |type, empty_body: false, length: nil|
   describe "#body" do
     subject { instance.body }
 

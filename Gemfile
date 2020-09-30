@@ -9,3 +9,5 @@ gem "rspec", "~> 3.0"
 gem "guard-rspec", "~> 4.7", :groups => [:development, :test]
 
 gem "rubocop", "~> 0.91.0"
+
+gem "faker", "~> 2.14"
