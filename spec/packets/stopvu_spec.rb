@@ -3,11 +3,11 @@ require "support/packet_examples"
 
 RSpec.describe PS2::Client::Packets::StopVU do
   subject(:instance) { described_class.new(vu) }
-  let(:vu) { 1 }
+  let(:vu) { fake_int32 }
 
   shared_examples_for "body" do
     it "has correct contents" do
-      expect(subject[0..3].unpack1("N")).to eq 1
+      expect(subject[0..3].unpack1("l>")).to eq vu
     end
 
     it "has correct length" do

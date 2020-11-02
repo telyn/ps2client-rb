@@ -10,7 +10,7 @@ module PS2
         end
 
         def body
-          [vu].pack("N")
+          [vu].pack("l>")
         end
 
         attr_reader :vu

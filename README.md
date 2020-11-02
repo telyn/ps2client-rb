@@ -1,39 +1,95 @@
-# Ps2::Client
+# PS2 Client (ruby)
 
-Welcome to your new gem! In this directory, you'll find the files you need to be able to package up your Ruby library into a gem. Put your Ruby code in the file `lib/ps2/client`. To experiment with that code, run `bin/console` for an interactive prompt.
+This is a (partial) re-implementation of ps2client in `ruby` - intended to form
+the non-ps2-side of the testing harness, as well as (eventually) having a
+command-line script like the ps2client binary itself.
 
-TODO: Delete this and the text above, and describe your gem
+The reason for making this is mainly that I want one program to be able to
+orchestrate the ps2's bootup, ps2link, program-launching and test result
+collection. Also, `ps2client listen` eats a core because the devs didn't add a
+sleep or using non-blocking i/o, which is a bit yikes.
+
+Each part of the process will be individually runnable (for debugging purposes,
+or in case your needs are more complex than mine), so you could use this program
+for, say, booting up the ps2 to ps2link, so you can run a program via other
+means. Or running a program assuming ps2link is already booted (could be useful
+for working with an emulator perhaps?)
+
+The plan is for it to supercede the scripts in [ps2runner][ps2runner] - so
+ps2client-rb will implement the ps2boot, ps2bootlink and ps2shutdown commands
+(probably as subcommands), and to implement the server-side of the exit-code
+protocol to allow propagation of exit codes. The idea is something like this:
+
+    $ ps2client execee host:hello-world.elf
+      Hello world
+    $ echo $?
+      0
+    $ ps2client execee host:hello-world-exit-1.elf
+      Hello world, this program returns exit code 1.
+    $ echo $?
+      1
 
 ## Installation
 
-Add this line to your application's Gemfile:
+### HEY!!! I recommend you wait til 1.0 before trying to use this tool
 
-```ruby
-gem 'ps2-client'
-```
+You will need Ruby 2.7 and LIRC installed, with LIRC configured to act as a
+ps2 remote.
 
-And then execute:
+TODO: put instructions here for configuring LIRC
 
-    $ bundle install
+    $ git clone https://github.com/telyn/ps2client-rb.git
+    $ gem build ps2client
+    $ gem install *.gem
 
-Or install it yourself as:
+### Docker
 
-    $ gem install ps2-client
+TODO: Dockerfile, docker instructions
 
 ## Usage
 
-TODO: Write usage instructions here
+TODO: divide into sections, document flags
 
-## Development
+General concept is to be similar to git - a few 'porcelain' commands, dedicated
+to providing a nice UI / wrapping up lots of functionality, and a bunch of
+smaller commands for the nitty-gritty.
 
-After checking out the repo, run `bin/setup` to install dependencies. Then, run `rake spec` to run the tests. You can also run `bin/console` for an interactive prompt that will allow you to experiment.
+(at least) the following will be implemented from ps2client, with completely
+compatible flags and arguments (though perhaps not output & exit codes):
 
-To install this gem onto your local machine, run `bundle exec rake install`. To release a new version, update the version number in `version.rb`, and then run `bundle exec rake release`, which will create a git tag for the version, push git commits and tags, and push the `.gem` file to [rubygems.org](https://rubygems.org).
+* execee
+* execiop
+* listen
+* netdump
+* scrdump
+
+In addition, the following will be implemented, in a compatible manner with the
+scripts from `ps2runner`:
+
+* boot
+* bootlink
+* shutdown
+
+And finally, a single command to wrap things up:
+
+* run
+  * boots the PS2 (into ps2link)
+  * executes the program on the ps2
+  * shuts down the PS2 afterwards.
 
 ## Contributing
 
-Bug reports and pull requests are welcome on GitHub at https://github.com/[USERNAME]/ps2-client.
+Bug reports and pull requests are welcome on GitHub at
+https://github.com/telyn/ps2client-rb.
 
+If you fork this repo or otherwise make changes to the code - please do open a
+PR. Also if you just use this repo for whatever, I'd love to hear what you're
+doing with it - just open an issue to say hi!
+
+## Future plans
+
+* Secondary stream to receive framebuffer data from a framebuffer-capturing
+  library I intend to write.
 
 ## License
 

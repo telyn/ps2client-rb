@@ -12,7 +12,7 @@ module PS2
         end
 
         def body
-          [register_type, pathname].pack("Na#{Helper::MAX_PATH_LEN}")
+          [register_type, pathname].pack("l>a#{Helper::MAX_PATH_LEN}")
         end
 
         attr_reader :register_type, :pathname

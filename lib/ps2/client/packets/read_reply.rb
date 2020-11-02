@@ -4,20 +4,20 @@ require "ps2/client/packets/helper"
 module PS2
   module Client
     module Packets
-      class Open < Packet
+      class ReadReply < Packet
         # flags is expected to be an integer as would be passed to open(2) or
         # fcntl(2). See the Fcntl standard library documentation.
-        def initialize(pathname, flags)
-          @pathname = pathname
-          @flags = flags
-          super(:open)
+        def initialize(result, size)
+          @result = result
+          @size = size
+          super(:read_reply)
         end
 
         def body
-          [flags, pathname].pack("l>a#{Helper::MAX_PATH_LEN}")
+          [result, size].pack("l>l>")
         end
 
-        attr_accessor :flags, :pathname
+        attr_accessor :result, :size
       end
     end
   end
