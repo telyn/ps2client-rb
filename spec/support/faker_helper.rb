@@ -1,7 +1,16 @@
+# frozen_string_literal: true
+
 require "faker"
+
 module FakerHelper
   def fake_file
     Faker::File.file_name(dir: "")[1..-1]
+  end
+
+  def fake_time
+    Faker::Time.between(from: Time.new(1970), to: Time.new(2100))
+               .localtime
+               .round
   end
 
   def fake_int32
@@ -10,6 +19,10 @@ module FakerHelper
 
   def fake_int8
     fake_int(8)
+  end
+
+  def fake_uint32
+    fake_uint(32)
   end
 
   def fake_uint8

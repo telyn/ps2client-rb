@@ -3,7 +3,7 @@ require "support/packet_examples"
 
 RSpec.describe PS2::Client::Packets::OpenReply do
   subject(:instance) { described_class.new(result) }
-  let(:result) { fake_int32 }
+  let(:result) { fake_uint32 }
 
   shared_examples_for "body" do
 

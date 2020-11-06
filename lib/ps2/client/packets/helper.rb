@@ -16,6 +16,24 @@ module PS2
           # \x1str1\0 followed by 251 (256 - "str1\0".length) NULs
           [argv.length, serialized_argv].pack("Na#{width}")
         end
+
+        def serialize_time(time)
+          parts = Array(8)
+          parts[7] = 0
+          parts[6] = time.year - 1900
+          parts[5] = time.month
+          parts[4] = time.mday
+          parts[3] = time.hour
+          parts[2] = time.min
+          parts[1] = time.sec
+          parts[0] = 0
+          parts.pack("C8")
+        end
+
+        def deserialize_time(bytes)
+          ints = bytes.unpack("C8")
+          Time.new(1900 + ints[6], ints[5], ints[4], ints[3], ints[2], ints[1])
+        end
       end
     end
   end
