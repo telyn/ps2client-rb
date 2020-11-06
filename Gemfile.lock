@@ -14,6 +14,9 @@ GEM
       i18n (>= 1.6, < 2)
     ffi (1.13.1)
     formatador (0.2.5)
+    fuubar (2.5.0)
+      rspec-core (~> 3.0)
+      ruby-progressbar (~> 1.4)
     guard (2.16.2)
       formatador (>= 0.2.4)
       listen (>= 2.7, < 4.0)
@@ -86,6 +89,7 @@ PLATFORMS
 
 DEPENDENCIES
   faker (~> 2.14)
+  fuubar (~> 2.5)
   guard-rspec (~> 4.7)
   ps2-client!
   rake (~> 12.0)
