@@ -1,0 +1,20 @@
+#!/usr/bin/env ruby
+
+require "bundler/setup"
+
+require "eventmachine"
+require "ps2/client/console_listener"
+
+Signal.trap("INT") do
+  puts "Caught interrupt, stopping..."
+  EM.stop_event_loop if EM.reactor_running?
+end
+
+Signal.trap("TERM") do
+  puts "Caught TERM signal, stopping..."
+  EM.stop_event_loop if EM.reactor_running?
+end
+
+EM.run do
+  PS2::Client::ConsoleListener.listen!
+end

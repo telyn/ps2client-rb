@@ -13,3 +13,5 @@ gem "rubocop", "~> 0.91.0"
 gem "faker", "~> 2.14"
 
 gem "fuubar", "~> 2.5"
+
+gem "eventmachine", "~> 1.2"
