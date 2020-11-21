@@ -1,20 +1,18 @@
 #!/usr/bin/env ruby
+# frozen_string_literal: true
 
 require "bundler/setup"
 
+# set up signal traps
+require "ps2/client/signal_traps"
+
 require "eventmachine"
 require "ps2/client/console_listener"
-
-Signal.trap("INT") do
-  puts "Caught interrupt, stopping..."
-  EM.stop_event_loop if EM.reactor_running?
-end
-
-Signal.trap("TERM") do
-  puts "Caught TERM signal, stopping..."
-  EM.stop_event_loop if EM.reactor_running?
-end
+require "lirc/protocol"
+require "lirc/commands"
 
 EM.run do
-  PS2::Client::ConsoleListener.listen!
+  PS2::Client::ConsoleListener.listen! do
+    on(:stdout, &method(:puts))
+  end
 end

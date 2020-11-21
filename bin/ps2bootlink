@@ -1,0 +1,116 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+
+require "bundler/setup"
+
+require "eventmachine"
+require "ps2/client/console_listener"
+require "ps2/client/em_runner"
+require "lirc/protocol"
+require "lirc/commands"
+
+class PS2BootLink
+  # TODO: implement lirc_socket - so it can work when lirc isn't exposed via a
+  # network interface
+  def initialize(lirc_server:, lirc_port: 8765, boot_link_button: "L1")
+    @lirc_server = lirc_server
+    @lirc_port = lirc_port
+    @boot_link_button = boot_link_button
+  end
+
+  def run!
+    EM.run do
+      setup_console_listener
+      setup_lirc
+      boot_ps2
+    end
+  end
+
+  private
+
+  def setup_console_listener
+    PS2::Client::ConsoleListener.listen! do
+      on(:stdout) do |msg|
+        puts msg
+      end
+
+      on(:ps2link_boot, &lambda do
+        puts "PS2 link has booted!"
+        stop_sending_boot_button
+        @timeout&.cancel
+
+        EmRunner.exit!(0)
+      end)
+    end
+  end
+
+  def start_sending_boot_button
+    @lirc.send_command(start_boot_button_cmd)
+        .errback do |err|
+          puts err
+          shutdown_and_exit
+        end
+  end
+
+  def stop_sending_boot_button
+    @lirc.send_command(stop_boot_button_cmd)
+        .errback do |err|
+          puts err
+          shutdown_and_exit
+        end
+  end
+
+  def setup_lirc
+    @lirc = LIRC::Protocol.connect!(server: @lirc_server, port: @lirc_port)
+  end
+
+  def boot_ps2
+    @lirc.send_command(reset_cmd)
+         .callback { start_ps2link }
+         .timeout(5)
+         .errback do |err|
+           puts err
+           shutdown_and_exit
+         end
+  end
+
+  def start_ps2link
+    setup_boot_timeout
+    start_sending_boot_button
+  end
+
+  def shutdown_and_exit
+    puts "Couldn't start PS2 into ps2link"
+    @lirc.send_command(shutdown_cmd)
+    EmRunner.exit!(1)
+  end
+
+  def setup_boot_timeout
+    @timeout = EM::PeriodicTimer.new(30) do
+      puts "PS2Link not booted after 30 seconds"
+      shutdown_and_exit
+      @timeout.cancel
+    end
+  end
+
+  def reset_cmd
+    LIRC::Commands::SendOnce.new("PS2", "Reset", 10)
+  end
+
+  def start_boot_button_cmd
+    LIRC::Commands::SendStart.new("PS2", @boot_link_button)
+  end
+
+  def stop_boot_button_cmd
+    LIRC::Commands::SendStop.new("PS2", @boot_link_button)
+  end
+
+  def shutdown_cmd
+    LIRC::Commands::SendOnce.new("PS2", "Reset", 50)
+  end
+end
+
+PS2BootLink.new(lirc_server: "raspberrypi", lirc_port: 8765)
+           .run!
+
+exit(EmRunner.exit_code)
